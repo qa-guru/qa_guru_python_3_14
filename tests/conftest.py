@@ -13,3 +13,9 @@ load_dotenv()
 def demoshop():
     api_url = os.getenv("API_URL")
     return BaseSession(api_url)
+
+
+@pytest.fixture(scope="session")
+def reqres():
+    api_url = "https://reqres.in"
+    return BaseSession(api_url)

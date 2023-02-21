@@ -34,3 +34,10 @@ def test_get_users_schema():
 
     assert response.status_code == 200
     assert S(single_user_schema) == response.json()
+
+
+def test_get_users_schema_with_session(reqres):
+    response = reqres.get("/api/users/2")
+
+    assert response.status_code == 200
+    assert S(single_user_schema) == response.json()
