@@ -11,6 +11,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+from framework.demoqa import DemoQA
+from framework.demoqa_with_env import DemoQaWithEnv
 from utils.base_session import BaseSession
 
 load_dotenv()
@@ -76,3 +78,31 @@ def test_login_though_api_with_base_session_fixture(demoshop):
 
     with step("Verify successful authorization"):
         browser.element(".account").should(have.text(LOGIN))
+
+
+def test_add_one_product_to_cart_authorized(demoshop):
+    """Тест с прокидыванием сессии во фреймворк"""
+    with step("Авторизоваться"):
+        demoqa = DemoQA(demoshop)
+        demoqa.authorization_cookie = demoqa.login(email=LOGIN, password=PASSWORD)
+
+    with step("Добавление товара в корзину"):
+        result = demoqa.add_to_cart(cookies=demoqa.authorization_cookie)
+
+    with step("Товар добавлен в корзину"):
+        assert result.status_code == 200
+        assert 'The product has been added to your' in result.json()["message"]
+
+
+def test_add_one_product_to_cart_authorized_with_env(env):
+    """Тест с прокидыванием окружения во фреймворк"""
+    with step("Авторизоваться"):
+        demoqa = DemoQaWithEnv(env)
+        demoqa.authorization_cookie = demoqa.login(email=LOGIN, password=PASSWORD)
+
+    with step("Добавление товара в корзину"):
+        result = demoqa.add_to_cart(cookies=demoqa.authorization_cookie)
+
+    with step("Товар добавлен в корзину"):
+        assert result.status_code == 200
+        assert 'The product has been added to your' in result.json()["message"]
